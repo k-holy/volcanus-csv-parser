@@ -1,0 +1,23 @@
+{
+    "name": "volcanus/csv-parser",
+    "type": "library",
+    "description": "CSV Parser for SplFileObject",
+    "keywords": ["csv"],
+    "homepage": "https://github.com/k-holy/volcanus-csv-parser",
+    "version": "1.0.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "k-holy",
+            "email": "k.holy74@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "ext-mbstring" : "*"
+    },
+    "autoload": {
+        "psr-0": { "Volcanus\\CsvParser": "" }
+    },
+    "target-dir": "Volcanus/CsvParser"
+}
