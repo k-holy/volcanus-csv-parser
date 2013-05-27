@@ -18,9 +18,7 @@ Standard PHP Library (SPL) のファイル入出力用クラス SplFileObject �
 ```php
 <?php
 
-$file = new \SplFileObject('php://temp', 'r+');
-
-$parser = new \Volcanus\CsvParser(array(
+$parser = new \Volcanus\CsvParser\CsvParser(array(
     'delimiter'      => ',',
     'enclosure'      => '"',
     'escape'         => '"',
