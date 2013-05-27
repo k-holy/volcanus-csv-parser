@@ -49,8 +49,9 @@ class CsvParser implements \ArrayAccess
 			'delimiter'      => ',',
 			'enclosure'      => '"',
 			'escape'         => '"',
-			'inputEncoding'  => mb_internal_encoding(),
-			'outputEncoding' => mb_internal_encoding(),
+			'inputEncoding'  => null,
+			'outputEncoding' => null,
+			'sanitizing'     => false,
 		));
 		if (!empty($configurations)) {
 			$this->config->attributes($configurations);
@@ -62,11 +63,12 @@ class CsvParser implements \ArrayAccess
 	 * 引数1の場合は指定された設定の値を返します。
 	 * 引数2の場合は指定された設置の値をセットして$thisを返します。
 	 *
-	 * delimiter       : フィールドの区切り文字 ※1文字のみ対応
-	 * enclosure       : フィールドの囲み文字 ※1文字のみ対応
-	 * escape          : フィールドに含まれる囲み文字のエスケープ文字 ※1文字のみ対応
-	 * inputEncoding   : 入力文字コード（CSVファイルの文字コード）
-	 * outputEncoding  : 出力文字コード（データの文字コード）
+	 * delimiter      : フィールドの区切り文字 ※1文字のみ対応
+	 * enclosure      : フィールドの囲み文字 ※1文字のみ対応
+	 * escape         : フィールドに含まれる囲み文字のエスケープ文字 ※1文字のみ対応
+	 * inputEncoding  : 入力文字コード（CSVファイルの文字コード）
+	 * outputEncoding : 出力文字コード（データの文字コード）
+	 * sanitizing     : 復帰・改行・水平タブ・スペース以外の制御コード自動削除を有効にするか
 	 *
 	 * @param string 設定名
 	 * @return mixed 設定値 または $this
@@ -102,6 +104,13 @@ class CsvParser implements \ArrayAccess
 						);
 					}
 					break;
+				case 'sanitizing':
+					if (!is_bool($value) && !is_int($value) && !ctype_digit($value)) {
+						throw new \InvalidArgumentException(
+							sprintf('The config parameter "%s" only accepts bool.', $name));
+					}
+					$value = (bool)$value;
+					break;
 				default:
 					throw new \InvalidArgumentException(
 						sprintf('The config parameter "%s" is not defined.', $name)
@@ -117,17 +126,19 @@ class CsvParser implements \ArrayAccess
 	/**
 	 * 1行分の文字列を取得し、まだ閉じられていない囲み文字があればFALSEを返します。
 	 *
-	 * 復帰・改行・水平タブ・スペース以外の制御コードを削除し、
-	 * 設定された出力エンコーディングと入力エンコーディングが異なる場合は変換します。
+	 * サニタイジングが有効な場合、復帰・改行・水平タブ・スペース以外の制御コードを削除します。
+	 * 出力エンコーディングが指定されており、入力エンコーディングと異なる場合は変換します。
 	 *
 	 * @param string 1行分の文字列
 	 * @return bool 1レコードの取得が終了したかどうか
 	 */
 	public function parse($line)
 	{
+		if ($this->config->get('sanitizing')) {
+			$line = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S', '', $line);
+		}
 		$outputEncoding = $this->config->get('outputEncoding');
 		$inputEncoding = $this->config->get('inputEncoding');
-		$line = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S', '', $line);
 		if (isset($outputEncoding)) {
 			if (!isset($inputEncoding)) {
 				$line = mb_convert_encoding($line, $outputEncoding, 'auto');
@@ -161,12 +172,13 @@ class CsvParser implements \ArrayAccess
 
 	/**
 	 * 1レコード分の文字列を配列に変換して返します。(PCRE正規表現版)
+	 * ただし、末尾が復帰・改行のみの文字列が渡された場合は、NULLを返します。
 	 *
 	 * 正規表現パターンは [Perlメモ] を参考
 	 * http://www.din.or.jp/~ohzaki/perl.htm#CSV2Values
 	 *
 	 * @param string 1レコード分の文字列
-	 * @return array 1レコード分の配列
+	 * @return mixed 1レコード分の配列 または NULL
 	 */
 	public function convert($record)
 	{
@@ -175,8 +187,14 @@ class CsvParser implements \ArrayAccess
 		$enclosure = $this->config->get('enclosure');
 		$escape = $this->config->get('escape');
 
-		// 行末の復帰・改行を削除し、正規表現パターン簡略化のためデリミタを付与
-		$record = preg_replace('/(?:\x0D\x0A|[\x0D\x0A])?$/', $delimiter, rtrim($record, "\x0A\x0D"));
+		// 行末の復帰・改行を削除し、空の場合はNULLを返す
+		$record = rtrim($record, "\x0A\x0D");
+		if (strlen($record) === 0) {
+			return null;
+		}
+
+		// 正規表現パターン簡略化のためデリミタを付与
+		$record = preg_replace('/(?:\x0D\x0A|[\x0D\x0A])?$/', $delimiter, $record);
 
 		$delimiter_quoted = preg_quote($delimiter);
 		$enclosure_quoted = preg_quote($enclosure);
@@ -217,6 +235,18 @@ class CsvParser implements \ArrayAccess
 	}
 
 	/**
+	 * magic setter
+	 *
+	 * @throws \RuntimeException
+	 */
+	public function __set($name, $value)
+	{
+		throw new \RuntimeException(
+			sprintf('The property "%s" is read only.', $name)
+		);
+	}
+
+	/**
 	 * ArrayAccess::offsetExists()
 	 *
 	 * @param mixed
@@ -247,25 +277,24 @@ class CsvParser implements \ArrayAccess
 	/**
 	 * ArrayAccess::offsetSet()
 	 *
-	 * @param mixed
-	 * @param mixed
+	 * @throws \RuntimeException
 	 */
 	public function offsetSet($offset, $value)
 	{
-		throw new \BadMethodCallException(
-			sprintf('The property "%s" is read only.', $offset)
+		throw new \RuntimeException(
+			sprintf('The key "%s" could not set.', $offset)
 		);
 	}
 
 	/**
 	 * ArrayAccess::offsetUnset()
 	 *
-	 * @param mixed
+	 * @throws \RuntimeException
 	 */
 	public function offsetUnset($offset)
 	{
-		throw new \BadMethodCallException(
-			sprintf('The property "%s" is read only.', $offset)
+		throw new \RuntimeException(
+			sprintf('The key "%s" could not unset.', $offset)
 		);
 	}
 
