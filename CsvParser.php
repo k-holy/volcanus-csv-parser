@@ -128,6 +128,7 @@ class CsvParser implements \ArrayAccess
 	 *
 	 * サニタイジングが有効な場合、復帰・改行・水平タブ・スペース以外の制御コードを削除します。
 	 * 出力エンコーディングが指定されており、入力エンコーディングと異なる場合は変換します。
+	 * 参考 http://en.wikipedia.org/wiki/C0_and_C1_control_codes
 	 *
 	 * @param string 1行分の文字列
 	 * @return bool 1レコードの取得が終了したかどうか
@@ -135,7 +136,7 @@ class CsvParser implements \ArrayAccess
 	public function parse($line)
 	{
 		if ($this->config->get('sanitizing')) {
-			$line = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S', '', $line);
+			$line = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]|\xC2[\x80-\x9F]/S', '', $line);
 		}
 		$outputEncoding = $this->config->get('outputEncoding');
 		$inputEncoding = $this->config->get('inputEncoding');
