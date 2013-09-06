@@ -54,7 +54,9 @@ class CsvParser implements \ArrayAccess
 			'sanitizing'     => false,
 		));
 		if (!empty($configurations)) {
-			$this->config->attributes($configurations);
+			foreach ($configurations as $name => $value) {
+				$this->config->offsetSet($name, $value);
+			}
 		}
 		return $this;
 	}
@@ -77,7 +79,7 @@ class CsvParser implements \ArrayAccess
 	{
 		switch (func_num_args()) {
 		case 1:
-			return $this->config->get($name);
+			return $this->config->offsetGet($name);
 		case 2:
 			$value = func_get_arg(1);
 			if (isset($value)) {
@@ -116,7 +118,7 @@ class CsvParser implements \ArrayAccess
 						sprintf('The config parameter "%s" is not defined.', $name)
 					);
 				}
-				$this->config->set($name, $value);
+				$this->config->offsetSet($name, $value);
 			}
 			return $this;
 		}
@@ -135,11 +137,11 @@ class CsvParser implements \ArrayAccess
 	 */
 	public function parse($line)
 	{
-		if ($this->config->get('sanitizing')) {
+		if ($this->config->offsetGet('sanitizing')) {
 			$line = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]|\xC2[\x80-\x9F]/S', '', $line);
 		}
-		$outputEncoding = $this->config->get('outputEncoding');
-		$inputEncoding = $this->config->get('inputEncoding');
+		$outputEncoding = $this->config->offsetGet('outputEncoding');
+		$inputEncoding = $this->config->offsetGet('inputEncoding');
 		if (isset($outputEncoding)) {
 			if (!isset($inputEncoding)) {
 				$line = mb_convert_encoding($line, $outputEncoding, 'auto');
@@ -148,7 +150,7 @@ class CsvParser implements \ArrayAccess
 			}
 		}
 		$this->buffer .= $line;
-		return (substr_count($this->buffer, $this->config->get('enclosure')) % 2 === 0);
+		return (substr_count($this->buffer, $this->config->offsetGet('enclosure')) % 2 === 0);
 	}
 
 	/**
@@ -184,9 +186,9 @@ class CsvParser implements \ArrayAccess
 	public function convert($record)
 	{
 
-		$delimiter = $this->config->get('delimiter');
-		$enclosure = $this->config->get('enclosure');
-		$escape = $this->config->get('escape');
+		$delimiter = $this->config->offsetGet('delimiter');
+		$enclosure = $this->config->offsetGet('enclosure');
+		$escape = $this->config->offsetGet('escape');
 
 		// 行末の復帰・改行を削除し、空の場合はNULLを返す
 		$record = rtrim($record, "\x0A\x0D");
@@ -232,7 +234,7 @@ class CsvParser implements \ArrayAccess
 		if (method_exists($this, 'get' . ucfirst($name))) {
 			return $this->{'get' . ucfirst($name)}();
 		}
-		return $this->config->get($name);
+		return $this->config->offsetGet($name);
 	}
 
 	/**
@@ -272,7 +274,7 @@ class CsvParser implements \ArrayAccess
 		if (method_exists($this, 'get' . ucfirst($offset))) {
 			return $this->{'get' . ucfirst($offset)}();
 		}
-		return $this->config->get($offset);
+		return $this->config->offsetGet($offset);
 	}
 
 	/**
