@@ -1,5 +1,8 @@
 #Volcanus_CsvParser
 
+[![Build Status](https://travis-ci.org/k-holy/volcanus-csv-parser.png?branch=master)](https://travis-ci.org/k-holy/volcanus-csv-parser)
+[![Build Status](https://travis-ci.org/k-holy/volcanus-csv-parser.png?branch=develop)](https://travis-ci.org/k-holy/volcanus-csv-parser)
+
 CSV文字列の解析を行うためのPHPクラスライブラリです。
 
 Standard PHP Library (SPL) のファイル入出力用クラス SplFileObject と組み合わせることで、簡単にファイルからの読み込みを行えます。
