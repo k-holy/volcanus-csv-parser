@@ -1,7 +1,7 @@
 #Volcanus_CsvParser
 
+[![Latest Stable Version](https://poser.pugx.org/volcanus/csv-parser/v/stable.png)](https://packagist.org/packages/volcanus/csv-parser)
 [![Build Status](https://travis-ci.org/k-holy/volcanus-csv-parser.png?branch=master)](https://travis-ci.org/k-holy/volcanus-csv-parser)
-[![Build Status](https://travis-ci.org/k-holy/volcanus-csv-parser.png?branch=develop)](https://travis-ci.org/k-holy/volcanus-csv-parser)
 
 CSV文字列の解析を行うためのPHPクラスライブラリです。
 
