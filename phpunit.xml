@@ -13,24 +13,21 @@
     stopOnFailure="false"
     stopOnIncomplete="false"
     stopOnSkipped="false"
-    strict="true"
+    syntaxCheck="true"
     verbose="true"
 >
     <testsuites>
         <testsuite name="Volcanus_CsvParser">
-            <directory suffix="Test.php">./Tests/</directory>
+            <directory suffix="Test.php">./Tests/Volcanus/CsvParser/Test</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
-            <directory>.</directory>
+            <directory>./src</directory>
             <exclude>
                 <directory>./Tests</directory>
                 <directory>./vendor</directory>
             </exclude>
         </whitelist>
     </filter>
-    <logging>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
-    </logging>
 </phpunit>

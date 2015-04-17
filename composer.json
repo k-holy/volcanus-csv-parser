@@ -13,14 +13,10 @@
         }
     ],
     "autoload": {
-        "psr-0": { "Volcanus\\CsvParser": "." }
+        "psr-4": { "Volcanus\\CsvParser\\": "src/" }
     },
-    "target-dir": "Volcanus/CsvParser",
     "require": {
         "php": ">=5.3",
         "ext-mbstring" : "*"
-    },
-    "require-dev": {
-        "satooshi/php-coveralls": "dev-master"
     }
 }
