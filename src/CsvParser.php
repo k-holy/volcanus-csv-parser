@@ -2,7 +2,7 @@
 /**
  * Volcanus libraries for PHP
  *
- * @copyright 2011-2013 k-holy <k.holy74@gmail.com>
+ * @copyright k-holy <k.holy74@gmail.com>
  * @license The MIT License (MIT)
  */
 
@@ -22,14 +22,14 @@ class CsvParser implements \ArrayAccess
     private $buffer;
 
     /**
-     * @var Configuration 設定値のコレクション
+     * @var \Volcanus\CsvParser\Configuration 設定値のコレクション
      */
     private $config;
 
     /**
      * コンストラクタ
      *
-     * @param array | \Traversable 設定オプション
+     * @param array|\Traversable $configurations 設定オプション
      */
     public function __construct($configurations = array())
     {
@@ -39,7 +39,7 @@ class CsvParser implements \ArrayAccess
     /**
      * 設定オプションおよびプロパティを初期化します。
      *
-     * @param array | \Traversable 設定オプション
+     * @param array|\Traversable $configurations 設定オプション
      * @return $this
      */
     public function initialize($configurations = array())
@@ -72,7 +72,7 @@ class CsvParser implements \ArrayAccess
      * outputEncoding : 出力文字コード（データの文字コード）
      * sanitizing     : 復帰・改行・水平タブ・スペース以外の制御コード自動削除を有効にするか
      *
-     * @param string 設定名
+     * @param string $name 設定名
      * @return mixed 設定値 または $this
      */
     public function config($name)
@@ -132,7 +132,7 @@ class CsvParser implements \ArrayAccess
      * 出力エンコーディングが指定されており、入力エンコーディングと異なる場合は変換します。
      * 参考 http://en.wikipedia.org/wiki/C0_and_C1_control_codes
      *
-     * @param string 1行分の文字列
+     * @param string $line 1行分の文字列
      * @return bool 1レコードの取得が終了したかどうか
      */
     public function parse($line)
@@ -180,8 +180,8 @@ class CsvParser implements \ArrayAccess
      * 正規表現パターンは [Perlメモ] を参考
      * http://www.din.or.jp/~ohzaki/perl.htm#CSV2Values
      *
-     * @param string 1レコード分の文字列
-     * @return mixed 1レコード分の配列 または NULL
+     * @param string $record 1レコード分の文字列
+     * @return array|null 1レコード分の配列 または NULL
      */
     public function convert($record)
     {
@@ -227,7 +227,8 @@ class CsvParser implements \ArrayAccess
     /**
      * magic getter
      *
-     * @param string 設定名
+     * @param string $name 設定名
+     * @return mixed
      */
     public function __get($name)
     {
@@ -240,7 +241,8 @@ class CsvParser implements \ArrayAccess
     /**
      * magic setter
      *
-     * @throws \RuntimeException
+     * @param string $name
+     * @param mixed $value
      */
     public function __set($name, $value)
     {
@@ -252,7 +254,7 @@ class CsvParser implements \ArrayAccess
     /**
      * ArrayAccess::offsetExists()
      *
-     * @param mixed
+     * @param mixed $offset
      * @return bool
      */
     public function offsetExists($offset)
@@ -260,13 +262,13 @@ class CsvParser implements \ArrayAccess
         if (method_exists($this, 'get' . ucfirst($offset))) {
             return !is_null($this->{'get' . ucfirst($offset)}());
         }
-        return $this->config->has($offset);
+        return $this->config->offsetExists($offset);
     }
 
     /**
      * ArrayAccess::offsetGet()
      *
-     * @param mixed
+     * @param mixed $offset
      * @return mixed
      */
     public function offsetGet($offset)
@@ -280,7 +282,8 @@ class CsvParser implements \ArrayAccess
     /**
      * ArrayAccess::offsetSet()
      *
-     * @throws \RuntimeException
+     * @param mixed $offset
+     * @param mixed $value
      */
     public function offsetSet($offset, $value)
     {
@@ -292,7 +295,7 @@ class CsvParser implements \ArrayAccess
     /**
      * ArrayAccess::offsetUnset()
      *
-     * @throws \RuntimeException
+     * @param mixed $offset
      */
     public function offsetUnset($offset)
     {
