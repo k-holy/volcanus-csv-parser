@@ -15,7 +15,7 @@ use Volcanus\CsvParser\CsvParser;
  *
  * @author k.holy74@gmail.com
  */
-class CsvParserTest extends \PHPUnit_Framework_TestCase
+class CsvParserTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testDefaultConfigParameter()
@@ -31,14 +31,14 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructWithConfigParameters()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'delimiter' => "\t",
             'enclosure' => "'",
             'escape' => '\\',
             'inputEncoding' => 'SJIS-win',
             'outputEncoding' => 'EUC-JP',
             'sanitizing' => true,
-        ));
+        ]);
         $this->assertEquals("\t", $parser->config('delimiter'));
         $this->assertEquals("'", $parser->config('enclosure'));
         $this->assertEquals('\\', $parser->config('escape'));
@@ -49,14 +49,14 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConfigByProperty()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'delimiter' => "\t",
             'enclosure' => "'",
             'escape' => '\\',
             'inputEncoding' => 'SJIS-win',
             'outputEncoding' => 'EUC-JP',
             'sanitizing' => true,
-        ));
+        ]);
         $this->assertEquals($parser->config('delimiter'), $parser->delimiter);
         $this->assertEquals($parser->config('enclosure'), $parser->enclosure);
         $this->assertEquals($parser->config('escape'), $parser->escape);
@@ -76,14 +76,14 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConfigByOffsetGet()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'delimiter' => "\t",
             'enclosure' => "'",
             'escape' => '\\',
             'inputEncoding' => 'SJIS-win',
             'outputEncoding' => 'EUC-JP',
             'sanitizing' => true,
-        ));
+        ]);
         $this->assertEquals($parser->config('delimiter'), $parser['delimiter']);
         $this->assertEquals($parser->config('enclosure'), $parser['enclosure']);
         $this->assertEquals($parser->config('escape'), $parser['escape']);
@@ -147,7 +147,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvert()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('1', '田中'),
+        $this->assertEquals(['1', '田中'],
             $parser->convert('1,田中' . "\r\n")
         );
     }
@@ -158,30 +158,30 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($parser->parse('1,"田中' . "\r\n"));
         $this->assertFalse($parser->parse("\r\n"));
         $this->assertTrue($parser->parse('"' . "\r\n"));
-        $this->assertEquals(array('1', "田中\r\n\r\n"),
+        $this->assertEquals(['1', "田中\r\n\r\n"],
             $parser->convert($parser->getBuffer())
         );
     }
 
     public function testParseWithConvertEncoding()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'inputEncoding' => 'SJIS',
             'outputEncoding' => 'UTF-8',
-        ));
+        ]);
         $this->assertTrue($parser->parse(mb_convert_encoding('1,ソ十貼能表暴予' . "\r\n", 'SJIS', 'UTF-8')));
-        $this->assertEquals(array('1', 'ソ十貼能表暴予'),
+        $this->assertEquals(['1', 'ソ十貼能表暴予'],
             $parser->convert($parser->getBuffer())
         );
     }
 
     public function testParseWithSanitizing()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'sanitizing' => true,
-        ));
+        ]);
         $this->assertTrue($parser->parse("1,田中\0\0" . "\r\n"));
-        $this->assertEquals(array('1', '田中'),
+        $this->assertEquals(['1', '田中'],
             $parser->convert($parser->getBuffer())
         );
     }
@@ -195,7 +195,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertEncloseDelimiter()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('1', '田中,'),
+        $this->assertEquals(['1', '田中,'],
             $parser->convert('1,"田中,"')
         );
     }
@@ -203,7 +203,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertEscapedEnclosure()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('1', '田中"'),
+        $this->assertEquals(['1', '田中"'],
             $parser->convert('1,"田中"""')
         );
     }
@@ -211,7 +211,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertEnclosedCarriageReturnAndLineFeed()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('1', "田中\r\n"),
+        $this->assertEquals(['1', "田中\r\n"],
             $parser->convert("1,\"田中\r\n\"")
         );
     }
@@ -219,7 +219,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertOnlySpaceField()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array(' ', '1', '田中'),
+        $this->assertEquals([' ', '1', '田中'],
             $parser->convert(' ,1,田中')
         );
     }
@@ -227,7 +227,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertNotClosedEnclosure()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('"', '1', '田中'),
+        $this->assertEquals(['"', '1', '田中'],
             $parser->convert('",1,田中')
         );
     }
@@ -235,7 +235,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertNotOpenedEnclosure()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('', '"', '1'),
+        $this->assertEquals(['', '"', '1'],
             $parser->convert(',","1"')
         );
     }
@@ -243,7 +243,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertNotClosedEnclosureAndSpaceBeforeDelimiter()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('" ', '"1" ', '田中"'),
+        $this->assertEquals(['" ', '"1" ', '田中"'],
             $parser->convert('" ,"1" ,田中""')
         );
     }
@@ -251,41 +251,41 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertNotClosedEnclosureAndSpaceAfterDelimiter()
     {
         $parser = new CsvParser();
-        $this->assertEquals(array('"', ' "1"', ' "田中"'),
+        $this->assertEquals(['"', ' "1"', ' "田中"'],
             $parser->convert('", "1", "田中""')
         );
     }
 
     public function testConvertTabSeparatedValues()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'delimiter' => "\t",
             'enclosure' => '"',
             'escape' => '\\',
-        ));
-        $this->assertEquals(array('1', '田中'),
+        ]);
+        $this->assertEquals(['1', '田中'],
             $parser->convert('1' . "\t" . '"田中"')
         );
     }
 
     public function testConvertTabSeparatedValuesAndEscapedEnclosure()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'delimiter' => "\t",
             'enclosure' => '"',
             'escape' => '\\',
-        ));
-        $this->assertEquals(array('1', '田中"'),
+        ]);
+        $this->assertEquals(['1', '田中"'],
             $parser->convert('1' . "\t" . '"田中\\""')
         );
     }
 
     public function testCsvParserWithSplFileObject()
     {
-        $parser = new CsvParser(array(
+        $parser = new CsvParser([
             'inputEncoding' => 'SJIS',
             'outputEncoding' => 'UTF-8',
-        ));
+        ]);
 
         $csvFile = new \SplFileObject('php://temp', '+r');
         $csvFile->fwrite(mb_convert_encoding("1,田中\r\n", 'SJIS', 'UTF-8'));
@@ -293,7 +293,7 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
         $csvFile->fwrite(mb_convert_encoding("3,\"鈴木\r\n\"\r\n", 'SJIS', 'UTF-8')); // 復帰・改行を含むレコード
         $csvFile->rewind();
 
-        $users = array();
+        $users = [];
 
         foreach ($csvFile as $line) {
 
