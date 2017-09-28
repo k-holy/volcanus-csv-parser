@@ -31,7 +31,7 @@ class CsvParser implements \ArrayAccess
      *
      * @param array|\Traversable $configurations 設定オプション
      */
-    public function __construct($configurations = array())
+    public function __construct($configurations = [])
     {
         $this->initialize($configurations);
     }
@@ -42,17 +42,17 @@ class CsvParser implements \ArrayAccess
      * @param array|\Traversable $configurations 設定オプション
      * @return $this
      */
-    public function initialize($configurations = array())
+    public function initialize($configurations = [])
     {
         $this->buffer = '';
-        $this->config = new Configuration(array(
+        $this->config = new Configuration([
             'delimiter' => ',',
             'enclosure' => '"',
             'escape' => '"',
             'inputEncoding' => null,
             'outputEncoding' => null,
             'sanitizing' => false,
-        ));
+        ]);
         if (!empty($configurations)) {
             foreach ($configurations as $name => $value) {
                 $this->config->offsetSet($name, $value);
@@ -216,7 +216,7 @@ class CsvParser implements \ArrayAccess
 
         $field_pattern = sprintf('/^%s(.*)%s$/s', $enclosure_quoted, $enclosure_quoted);
 
-        $fields = array();
+        $fields = [];
         foreach ($matches[1] as $value) {
             $fields[] = str_replace($escape . $enclosure, $enclosure, preg_replace($field_pattern, '$1', $value));
         }

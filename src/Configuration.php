@@ -26,9 +26,9 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param array $attributes 属性の配列
      */
-    public function __construct($attributes = array())
+    public function __construct($attributes = [])
     {
-        $this->attributes = array();
+        $this->attributes = [];
         if (!empty($attributes)) {
             if (!is_array($attributes) && !($attributes instanceof \Traversable)) {
                 throw new \InvalidArgumentException(
