@@ -2,14 +2,14 @@
 <phpunit bootstrap="Tests/bootstrap.php">
     <testsuites>
         <testsuite>
-            <directory suffix="Test.php">Tests</directory>
+            <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
             <directory suffix=".php">src</directory>
             <exclude>
-                <directory>Tests</directory>
+                <directory>tests</directory>
                 <directory>vendor</directory>
             </exclude>
         </whitelist>

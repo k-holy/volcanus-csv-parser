@@ -27,6 +27,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($parser->config('inputEncoding'));
         $this->assertNull($parser->config('outputEncoding'));
         $this->assertFalse($parser->config('sanitizing'));
+        $this->assertFalse($parser->config('eraseBom'));
     }
 
     public function testConstructWithConfigParameters()
@@ -38,6 +39,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
             'inputEncoding' => 'SJIS-win',
             'outputEncoding' => 'EUC-JP',
             'sanitizing' => true,
+            'eraseBom' => true,
         ]);
         $this->assertEquals("\t", $parser->config('delimiter'));
         $this->assertEquals("'", $parser->config('enclosure'));
@@ -45,6 +47,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('SJIS-win', $parser->config('inputEncoding'));
         $this->assertEquals('EUC-JP', $parser->config('outputEncoding'));
         $this->assertTrue($parser->config('sanitizing'));
+        $this->assertTrue($parser->config('eraseBom'));
     }
 
     public function testGetConfigByProperty()
@@ -56,6 +59,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
             'inputEncoding' => 'SJIS-win',
             'outputEncoding' => 'EUC-JP',
             'sanitizing' => true,
+            'eraseBom' => true,
         ]);
         $this->assertEquals($parser->config('delimiter'), $parser->delimiter);
         $this->assertEquals($parser->config('enclosure'), $parser->enclosure);
@@ -63,6 +67,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parser->config('inputEncoding'), $parser->inputEncoding);
         $this->assertEquals($parser->config('outputEncoding'), $parser->outputEncoding);
         $this->assertEquals($parser->config('sanitizing'), $parser->sanitizing);
+        $this->assertEquals($parser->config('eraseBom'), $parser->eraseBom);
     }
 
     /**
@@ -83,6 +88,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
             'inputEncoding' => 'SJIS-win',
             'outputEncoding' => 'EUC-JP',
             'sanitizing' => true,
+            'eraseBom' => true,
         ]);
         $this->assertEquals($parser->config('delimiter'), $parser['delimiter']);
         $this->assertEquals($parser->config('enclosure'), $parser['enclosure']);
@@ -90,6 +96,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parser->config('inputEncoding'), $parser['inputEncoding']);
         $this->assertEquals($parser->config('outputEncoding'), $parser['outputEncoding']);
         $this->assertEquals($parser->config('sanitizing'), $parser['sanitizing']);
+        $this->assertEquals($parser->config('eraseBom'), $parser['eraseBom']);
     }
 
     /**
@@ -181,6 +188,42 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
             'sanitizing' => true,
         ]);
         $this->assertTrue($parser->parse("1,田中\0\0" . "\r\n"));
+        $this->assertEquals(['1', '田中'],
+            $parser->convert($parser->getBuffer())
+        );
+    }
+
+    public function testParseWithEraseBomUtf8()
+    {
+        $parser = new CsvParser([
+            'inputEncoding' => CsvParser::ENCODING_UTF8,
+            'eraseBom' => true,
+        ]);
+        $this->assertTrue($parser->parse("\xEF\xBB\xBF1,田中" . "\r\n"));
+        $this->assertEquals(['1', '田中'],
+            $parser->convert($parser->getBuffer())
+        );
+    }
+
+    public function testParseWithEraseBomUtf16le()
+    {
+        $parser = new CsvParser([
+            'inputEncoding' => CsvParser::ENCODING_UTF16LE,
+            'eraseBom' => true,
+        ]);
+        $this->assertTrue($parser->parse("\xFE\xFF1,田中" . "\r\n"));
+        $this->assertEquals(['1', '田中'],
+            $parser->convert($parser->getBuffer())
+        );
+    }
+
+    public function testParseWithEraseBomUtf16be()
+    {
+        $parser = new CsvParser([
+            'inputEncoding' => CsvParser::ENCODING_UTF16BE,
+            'eraseBom' => true,
+        ]);
+        $this->assertTrue($parser->parse("\xFF\xFE1,田中" . "\r\n"));
         $this->assertEquals(['1', '田中'],
             $parser->convert($parser->getBuffer())
         );
