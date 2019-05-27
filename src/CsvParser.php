@@ -11,6 +11,15 @@ namespace Volcanus\CsvParser;
 /**
  * CSV Parser for SplFileObject
  *
+ * @property $delimiter
+ * @property $enclosure
+ * @property $escape
+ * @property $inputEncoding
+ * @property $outputEncoding
+ * @property $sanitizing
+ * @property $eraseBom
+ * @property $buffer
+ *
  * @author k.holy74@gmail.com
  */
 class CsvParser implements \ArrayAccess
