@@ -3,12 +3,12 @@ general:
   test_targets:
     recursive: true
     resources:
-      - Tests
+      - tests
   autotest:
     enabled: false
     watch_dirs:
       - src
-      - Tests
+      - tests
   notify: true
 
 phpunit:

@@ -11,10 +11,26 @@ namespace Volcanus\CsvParser;
 /**
  * CSV Parser for SplFileObject
  *
+ * @property $delimiter
+ * @property $enclosure
+ * @property $escape
+ * @property $inputEncoding
+ * @property $outputEncoding
+ * @property $sanitizing
+ * @property $eraseBom
+ * @property $buffer
+ *
  * @author k.holy74@gmail.com
  */
 class CsvParser implements \ArrayAccess
 {
+
+    const BOM_UTF8 = "\xEF\xBB\xBF";
+    const BOM_UTF16LE = "\xFE\xFF";
+    const BOM_UTF16BE = "\xFF\xFE";
+    const ENCODING_UTF8 = 'utf-8';
+    const ENCODING_UTF16LE = 'utf-16le';
+    const ENCODING_UTF16BE = 'utf-16';
 
     /**
      * @var string レコードの文字列を保持するバッファ
@@ -52,6 +68,7 @@ class CsvParser implements \ArrayAccess
             'inputEncoding' => null,
             'outputEncoding' => null,
             'sanitizing' => false,
+            'eraseBom' => false,
         ]);
         if (!empty($configurations)) {
             foreach ($configurations as $name => $value) {
@@ -71,6 +88,7 @@ class CsvParser implements \ArrayAccess
      * inputEncoding  : 入力文字コード（CSVファイルの文字コード）
      * outputEncoding : 出力文字コード（データの文字コード）
      * sanitizing     : 復帰・改行・水平タブ・スペース以外の制御コード自動削除を有効にするか
+     * eraseBom       : 1行目の読み込み時にBOMを消去するかどうか
      *
      * @param string $name 設定名
      * @return mixed 設定値 または $this
@@ -107,6 +125,7 @@ class CsvParser implements \ArrayAccess
                             }
                             break;
                         case 'sanitizing':
+                        case 'eraseBom':
                             if (!is_bool($value) && !is_int($value) && !ctype_digit($value)) {
                                 throw new \InvalidArgumentException(
                                     sprintf('The config parameter "%s" only accepts bool.', $name));
@@ -142,6 +161,23 @@ class CsvParser implements \ArrayAccess
         }
         $outputEncoding = $this->config->offsetGet('outputEncoding');
         $inputEncoding = $this->config->offsetGet('inputEncoding');
+        if (strlen($this->buffer) === 0 && $this->config->offsetGet('eraseBom')) {
+            $bom = null;
+            switch (strtolower($inputEncoding)) {
+                case self::ENCODING_UTF8:
+                    $bom = self::BOM_UTF8;
+                    break;
+                case self::ENCODING_UTF16LE:
+                    $bom = self::BOM_UTF16LE;
+                    break;
+                case self::ENCODING_UTF16BE:
+                    $bom = self::BOM_UTF16BE;
+                    break;
+            }
+            if ($bom !== null) {
+                $line = preg_replace(sprintf('/^%s/', $bom), '', $line);
+            }
+        }
         if (isset($outputEncoding)) {
             if (!isset($inputEncoding)) {
                 $line = mb_convert_encoding($line, $outputEncoding, 'auto');
