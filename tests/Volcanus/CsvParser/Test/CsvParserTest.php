@@ -6,8 +6,9 @@
  * @license The MIT License (MIT)
  */
 
-namespace Volcanus\CsvParser\Tests;
+namespace Volcanus\CsvParser\Test;
 
+use PHPUnit\Framework\TestCase;
 use Volcanus\CsvParser\CsvParser;
 
 /**
@@ -15,7 +16,7 @@ use Volcanus\CsvParser\CsvParser;
  *
  * @author k.holy74@gmail.com
  */
-class CsvParserTest extends \PHPUnit\Framework\TestCase
+class CsvParserTest extends TestCase
 {
 
     public function testDefaultConfigParameter()
@@ -70,11 +71,9 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parser->config('eraseBom'), $parser->eraseBom);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testRaiseExceptionWhenSetConfigByProperty()
     {
+        $this->expectException(\RuntimeException::class);
         $parser = new CsvParser();
         $parser->delimiter = "\t";
     }
@@ -99,20 +98,16 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parser->config('eraseBom'), $parser['eraseBom']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testRaiseExceptionWhenSetConfigByOffsetSet()
     {
+        $this->expectException(\RuntimeException::class);
         $parser = new CsvParser();
         $parser['delimiter'] = "\t";
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testRaiseExceptionWhenUnsetConfigByArrayAccess()
     {
+        $this->expectException(\RuntimeException::class);
         $parser = new CsvParser();
         unset($parser['delimiter']);
     }
@@ -362,7 +357,7 @@ class CsvParserTest extends \PHPUnit\Framework\TestCase
             $users[] = $user;
         }
 
-        $this->assertEquals(3, count($users));
+        $this->assertCount(3, $users);
         $this->assertEquals('1', $users[0]->id);
         $this->assertEquals('田中', $users[0]->name);
         $this->assertEquals('2', $users[1]->id);

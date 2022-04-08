@@ -38,7 +38,7 @@ class CsvParser implements \ArrayAccess
     private $buffer;
 
     /**
-     * @var \Volcanus\CsvParser\Configuration 設定値のコレクション
+     * @var Configuration 設定値のコレクション
      */
     private $config;
 
@@ -56,9 +56,9 @@ class CsvParser implements \ArrayAccess
      * 設定オプションおよびプロパティを初期化します。
      *
      * @param array|\Traversable $configurations 設定オプション
-     * @return $this
+     * @return self
      */
-    public function initialize($configurations = [])
+    public function initialize($configurations = []): self
     {
         $this->buffer = '';
         $this->config = new Configuration([
@@ -93,7 +93,7 @@ class CsvParser implements \ArrayAccess
      * @param string $name 設定名
      * @return mixed 設定値 または $this
      */
-    public function config($name)
+    public function config(string $name)
     {
         switch (func_num_args()) {
             case 1:
@@ -154,7 +154,7 @@ class CsvParser implements \ArrayAccess
      * @param string $line 1行分の文字列
      * @return bool 1レコードの取得が終了したかどうか
      */
-    public function parse($line)
+    public function parse(string $line): bool
     {
         if ($this->config->offsetGet('sanitizing')) {
             $line = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]|\xC2[\x80-\x9F]/S', '', $line);
@@ -194,7 +194,7 @@ class CsvParser implements \ArrayAccess
      *
      * @return string レコードの文字列
      */
-    public function getBuffer()
+    public function getBuffer(): string
     {
         $buffer = $this->buffer;
         $this->clear();
@@ -219,7 +219,7 @@ class CsvParser implements \ArrayAccess
      * @param string $record 1レコード分の文字列
      * @return array|null 1レコード分の配列 または NULL
      */
-    public function convert($record)
+    public function convert(string $record): ?array
     {
 
         $delimiter = $this->config->offsetGet('delimiter');
@@ -266,7 +266,7 @@ class CsvParser implements \ArrayAccess
      * @param string $name 設定名
      * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         if (method_exists($this, 'get' . ucfirst($name))) {
             return $this->{'get' . ucfirst($name)}();
@@ -280,7 +280,7 @@ class CsvParser implements \ArrayAccess
      * @param string $name
      * @param mixed $value
      */
-    public function __set($name, $value)
+    public function __set(string $name, $value)
     {
         throw new \RuntimeException(
             sprintf('The property "%s" is read only.', $name)
@@ -293,7 +293,7 @@ class CsvParser implements \ArrayAccess
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         if (method_exists($this, 'get' . ucfirst($offset))) {
             return !is_null($this->{'get' . ucfirst($offset)}());
