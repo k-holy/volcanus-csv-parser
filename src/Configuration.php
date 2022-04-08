@@ -24,7 +24,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * コンストラクタ
      *
-     * @param array $attributes 属性の配列
+     * @param array|\Traversable $attributes 属性の配列
      */
     public function __construct($attributes = [])
     {
@@ -46,9 +46,9 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name 属性名
      * @param mixed $value 初期値
-     * @return $this
+     * @return self
      */
-    public function define($name, $value = null)
+    public function define(string $name, $value = null): self
     {
         if (array_key_exists($name, $this->attributes)) {
             throw new \InvalidArgumentException(
@@ -111,7 +111,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->attributes[$offset]);
     }
@@ -122,7 +122,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param string $name 属性名
      * @param mixed $value 属性値
      */
-    public function __set($name, $value)
+    public function __set(string $name, $value)
     {
         $this->offsetSet($name, $value);
     }
@@ -133,7 +133,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param string $name 属性名
      * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         return $this->offsetGet($name);
     }
@@ -145,7 +145,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param array $args
      * @return mixed
      */
-    public function __call($name, $args)
+    public function __call(string $name, array $args)
     {
         if (array_key_exists($name, $this->attributes)) {
             $value = $this->attributes[$name];
@@ -171,7 +171,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->attributes);
     }
@@ -181,7 +181,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->attributes);
     }
