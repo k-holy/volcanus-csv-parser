@@ -1,8 +1,7 @@
-#Volcanus_CsvParser
+# Volcanus_CsvParser
 
 [![Latest Stable Version](https://poser.pugx.org/volcanus/csv-parser/v/stable.png)](https://packagist.org/packages/volcanus/csv-parser)
-[![Build Status](https://travis-ci.org/k-holy/volcanus-csv-parser.png?branch=master)](https://travis-ci.org/k-holy/volcanus-csv-parser)
-[![Coverage Status](https://coveralls.io/repos/k-holy/volcanus-csv-parser/badge.png?branch=master)](https://coveralls.io/r/k-holy/volcanus-csv-parser?branch=master)
+[![Continuous Integration](https://github.com/k-holy/volcanus-csv-parser/actions/workflows/ci.yml/badge.svg)](https://github.com/k-holy/volcanus-csv-parser/actions/workflows/ci.yml)
 
 CSV文字列の解析を行うためのPHPクラスライブラリです。
 
@@ -10,26 +9,24 @@ Standard PHP Library (SPL) のファイル入出力用クラス SplFileObject �
 
 [Volcanus_Csv](https://github.com/k-holy/Volcanus_Csv) からの派生物で、CSV入力に関する最低限の機能を移植しています。
 
+## 環境
 
-##環境
-
-* PHP 5.3以降
+* PHP 7.3以降
 * mbstring拡張
 
-
-##使い方
+## 使い方
 
 ```php
 <?php
 
-$parser = new \Volcanus\CsvParser\CsvParser(array(
+$parser = new \Volcanus\CsvParser\CsvParser([
     'delimiter'      => ',',
     'enclosure'      => '"',
     'escape'         => '"',
     'inputEncoding'  => 'SJIS',
     'outputEncoding' => 'UTF-8',
     'sanitizing'     => true,
-));
+]);
 
 $csvFile = new \SplFileObject('php://temp', '+r');
 $csvFile->fwrite(mb_convert_encoding("1,田中\r\n", 'SJIS', 'UTF-8'));
@@ -37,7 +34,7 @@ $csvFile->fwrite(mb_convert_encoding("2,山田\r\n", 'SJIS', 'UTF-8'));
 $csvFile->fwrite(mb_convert_encoding("3,鈴木\r\n", 'SJIS', 'UTF-8'));
 $csvFile->rewind();
 
-$users = array();
+$users = [];
 
 foreach ($csvFile as $line) {
 
@@ -72,7 +69,7 @@ echo $users[2]->name; // 鈴木
 
 ```
 
-###注意点
+### 注意点
 
 SplFileObjectを前提としていますが、CSVの加工は独自の処理を行なっています。
 そのため、[SplFileObject::setCsvControl()](http://jp2.php.net/manual/ja/splfileobject.setcsvcontrol.php) で設定した値は利用されません。
@@ -82,5 +79,4 @@ SplFileObjectを前提としていますが、CSVの加工は独自の処理を�
 
 復帰・改行・水平タブ・スペース以外の制御コードを自動で削除するサニタイジング機能を備えていますが、初期設定では無効になっています。
 
-設定値の取得にはプロパティアクセス、配列アクセスを利用できますが、設定値のセットには利用できません。
-コンストラクタのパラメータで指定するか、config()メソッドを呼ぶ必要があります。
+設定値の取得にはプロパティアクセス、配列アクセスを利用できますが、設定値のセットには利用できません。 コンストラクタのパラメータで指定するか、config()メソッドを呼ぶ必要があります。
