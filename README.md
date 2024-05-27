@@ -11,7 +11,7 @@ Standard PHP Library (SPL) のファイル入出力用クラス SplFileObject �
 
 ## 環境
 
-* PHP 7.3以降
+* PHP 8.1以降
 * mbstring拡張
 
 ## 使い方

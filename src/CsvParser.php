@@ -1,6 +1,6 @@
 <?php
 /**
- * Volcanus libraries for PHP
+ * Volcanus libraries for PHP 8.1~
  *
  * @copyright k-holy <k.holy74@gmail.com>
  * @license The MIT License (MIT)
@@ -35,19 +35,19 @@ class CsvParser implements \ArrayAccess
     /**
      * @var string レコードの文字列を保持するバッファ
      */
-    private $buffer;
+    private string $buffer;
 
     /**
      * @var Configuration 設定値のコレクション
      */
-    private $config;
+    private Configuration $config;
 
     /**
      * コンストラクタ
      *
-     * @param array|\Traversable $configurations 設定オプション
+     * @param iterable $configurations 設定オプション
      */
-    public function __construct($configurations = [])
+    public function __construct(iterable $configurations = [])
     {
         $this->initialize($configurations);
     }
@@ -55,10 +55,10 @@ class CsvParser implements \ArrayAccess
     /**
      * 設定オプションおよびプロパティを初期化します。
      *
-     * @param array|\Traversable $configurations 設定オプション
+     * @param iterable $configurations 設定オプション
      * @return self
      */
-    public function initialize($configurations = []): self
+    public function initialize(iterable $configurations = []): self
     {
         $this->buffer = '';
         $this->config = new Configuration([
@@ -91,9 +91,9 @@ class CsvParser implements \ArrayAccess
      * eraseBom       : 1行目の読み込み時にBOMを消去するかどうか
      *
      * @param string $name 設定名
-     * @return mixed 設定値 または $this
+     * @return string|bool|int|null|self 設定値 または $this
      */
-    public function config(string $name)
+    public function config(string $name): string|bool|int|null|self
     {
         switch (func_num_args()) {
             case 1:
@@ -204,7 +204,7 @@ class CsvParser implements \ArrayAccess
     /**
      * バッファを空にします。
      */
-    public function clear()
+    public function clear(): void
     {
         $this->buffer = '';
     }
@@ -266,7 +266,7 @@ class CsvParser implements \ArrayAccess
      * @param string $name 設定名
      * @return mixed
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         if (method_exists($this, 'get' . ucfirst($name))) {
             return $this->{'get' . ucfirst($name)}();
@@ -280,7 +280,7 @@ class CsvParser implements \ArrayAccess
      * @param string $name
      * @param mixed $value
      */
-    public function __set(string $name, $value)
+    public function __set(string $name, mixed $value): void
     {
         throw new \RuntimeException(
             sprintf('The property "%s" is read only.', $name)
@@ -293,7 +293,7 @@ class CsvParser implements \ArrayAccess
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         if (method_exists($this, 'get' . ucfirst($offset))) {
             return !is_null($this->{'get' . ucfirst($offset)}());
@@ -307,7 +307,7 @@ class CsvParser implements \ArrayAccess
      * @param mixed $offset
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         if (method_exists($this, 'get' . ucfirst($offset))) {
             return $this->{'get' . ucfirst($offset)}();
@@ -321,7 +321,7 @@ class CsvParser implements \ArrayAccess
      * @param mixed $offset
      * @param mixed $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new \RuntimeException(
             sprintf('The key "%s" could not set.', $offset)
@@ -333,7 +333,7 @@ class CsvParser implements \ArrayAccess
      *
      * @param mixed $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new \RuntimeException(
             sprintf('The key "%s" could not unset.', $offset)

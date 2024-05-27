@@ -1,6 +1,6 @@
 <?php
 /**
- * Volcanus libraries for PHP
+ * Volcanus libraries for PHP 8.1~
  *
  * @copyright k-holy <k.holy74@gmail.com>
  * @license The MIT License (MIT)
@@ -19,22 +19,17 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @var array 属性の配列
      */
-    private $attributes;
+    private array $attributes;
 
     /**
      * コンストラクタ
      *
-     * @param array|\Traversable $attributes 属性の配列
+     * @param iterable $attributes 属性の配列
      */
-    public function __construct($attributes = [])
+    public function __construct(iterable $attributes = [])
     {
         $this->attributes = [];
         if (!empty($attributes)) {
-            if (!is_array($attributes) && !($attributes instanceof \Traversable)) {
-                throw new \InvalidArgumentException(
-                    'The attributes is not Array and not Traversable.'
-                );
-            }
             foreach ($attributes as $name => $value) {
                 $this->define($name, $value);
             }
@@ -48,7 +43,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param mixed $value 初期値
      * @return self
      */
-    public function define(string $name, $value = null): self
+    public function define(string $name, mixed $value = null): self
     {
         if (array_key_exists($name, $this->attributes)) {
             throw new \InvalidArgumentException(
@@ -69,7 +64,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param mixed $offset
      * @param mixed $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (!array_key_exists($offset, $this->attributes)) {
             throw new \InvalidArgumentException(
@@ -84,7 +79,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param mixed $offset
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         if (!array_key_exists($offset, $this->attributes)) {
             throw new \InvalidArgumentException(
@@ -98,7 +93,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param mixed $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         if (array_key_exists($offset, $this->attributes)) {
             $this->attributes[$offset] = null;
@@ -111,7 +106,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->attributes[$offset]);
     }
@@ -122,7 +117,7 @@ class Configuration implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param string $name 属性名
      * @param mixed $value 属性値
      */
-    public function __set(string $name, $value)
+    public function __set(string $name, mixed $value)
     {
         $this->offsetSet($name, $value);
     }
