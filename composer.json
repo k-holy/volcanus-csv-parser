@@ -6,7 +6,7 @@
   "keywords": [
     "csv"
   ],
-  "version": "2.1.0",
+  "version": "3.0.0",
   "license": "MIT",
   "authors": [
     {
@@ -20,7 +20,7 @@
     }
   },
   "require": {
-    "php": ">=7.3||>=8.0.2",
+    "php": "^8.1",
     "ext-ctype": "*",
     "ext-mbstring": "*"
   },
